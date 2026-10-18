@@ -1,0 +1,556 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Zeraki Analytics - Learner Results</title>
+
+<style>
+:root {
+  --green:#159447;
+  --blue:#1769aa;
+  --bg:#f3f6fa;
+  --dark:#233348;
+}
+* { box-sizing:border-box; }
+body {
+  margin:0;
+  font-family:Arial,sans-serif;
+  background:var(--bg);
+  color:var(--dark);
+}
+header {
+  background:white;
+  padding:16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  box-shadow:0 2px 8px #0001;
+}
+.brand { color:var(--green);font-size:20px;font-weight:bold; }
+.brand span { color:var(--blue); }
+.avatar {
+  background:var(--green);
+  color:white;
+  border-radius:50%;
+  padding:10px;
+}
+nav {
+  display:flex;
+  overflow-x:auto;
+  background:var(--blue);
+}
+nav button {
+  flex:1;
+  min-width:85px;
+  padding:14px 8px;
+  border:0;
+  background:none;
+  color:white;
+  cursor:pointer;
+}
+nav button.active { background:var(--green); }
+main { max-width:950px;margin:auto;padding:16px; }
+.page { display:none; }
+.page.active { display:block; }
+.hero {
+  padding:23px 18px;
+  border-radius:12px;
+  color:white;
+  background:linear-gradient(120deg,var(--green),var(--blue));
+  margin-bottom:16px;
+}
+.hero h2 { margin-top:0; }
+.cards {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+}
+.card,.panel {
+  background:white;
+  border-radius:10px;
+  padding:16px;
+  box-shadow:0 2px 8px #0000000b;
+}
+.card { border-left:4px solid var(--green); }
+.card small { color:#718096; }
+.number {
+  display:block;
+  margin-top:10px;
+  color:var(--blue);
+  font-size:25px;
+  font-weight:bold;
+}
+.panel { margin-top:16px; }
+h3 { margin-top:0; }
+label {
+  display:block;
+  margin:12px 0 5px;
+  font-size:14px;
+  font-weight:bold;
+}
+input,select {
+  display:block;
+  width:100%;
+  padding:12px;
+  border:1px solid #d5deea;
+  border-radius:7px;
+  background:white;
+  font-size:15px;
+}
+.subject-grid {
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:0 12px;
+}
+button.action {
+  border:0;
+  background:var(--green);
+  color:white;
+  border-radius:7px;
+  padding:12px 16px;
+  cursor:pointer;
+  margin:6px 5px 6px 0;
+}
+button.blue { background:var(--blue); }
+.table-wrap { overflow-x:auto; }
+table { width:100%;border-collapse:collapse;font-size:13px; }
+th,td {
+  padding:11px 9px;
+  border-bottom:1px solid #e4eaf1;
+  text-align:left;
+  white-space:nowrap;
+}
+th { background:var(--blue);color:white; }
+tr:nth-child(even) { background:#f7f9fc; }
+.notice {
+  padding:12px;
+  background:#e7f6ed;
+  color:#176b37;
+  border-radius:7px;
+  margin:12px 0;
+}
+.error { background:#ffeded;color:#a32424; }
+.muted { color:#718096;font-size:13px; }
+footer { text-align:center;padding:25px 10px;color:#788596;font-size:12px; }
+@media(min-width:650px) {
+  .cards { grid-template-columns:repeat(4,minmax(0,1fr)); }
+  .subject-grid { grid-template-columns:repeat(3,minmax(0,1fr)); }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">zeraki <span>analytics</span></div>
+  <div class="avatar">LR</div>
+</header>
+
+<nav>
+  <button class="active" onclick="showPage('dashboard',this)">Dashboard</button>
+  <button onclick="showPage('entry',this)">Enter Results</button>
+  <button onclick="showPage('records',this)">Learners</button>
+  <button onclick="showPage('reports',this)">Reports</button>
+</nav>
+
+<main>
+
+<div id="dashboard" class="page active">
+  <div class="hero">
+    <h2>Learner Results Dashboard</h2>
+    <p>Manage learner records and academic performance.</p>
+    <p>Academic Year: 2026</p>
+  </div>
+
+  <div class="cards">
+    <div class="card"><small>Total Learners</small><span class="number" id="count">0</span></div>
+    <div class="card"><small>Mean Score</small><span class="number" id="overallMean">0.00</span></div>
+    <div class="card"><small>Highest Mean</small><span class="number" id="highestMean">0.00</span></div>
+    <div class="card"><small>Subjects</small><span class="number">7</span></div>
+  </div>
+
+  <div class="panel">
+    <h3>System Information</h3>
+    <p>Maths, English, Computer, Kiswahili, Biology, Chemistry and CSL.</p>
+    <p>Maximum total: 700 marks.</p>
+    <button class="action" onclick="showPage('entry',document.querySelectorAll('nav button')[1])">Enter New Results</button>
+  </div>
+</div>
+
+<div id="entry" class="page">
+  <div class="panel">
+    <h3>Enter Learner Details</h3>
+
+    <form id="learnerForm">
+      <label for="name">Learner Name</label>
+      <input id="name" required maxlength="100" placeholder="Enter full name">
+
+      <label for="stream">Stream</label>
+      <input id="stream" required maxlength="40" placeholder="e.g. 3 East">
+
+      <label for="admission">Admission Number</label>
+      <input id="admission" required maxlength="40" placeholder="e.g. ADM001">
+
+      <h3 style="margin-top:22px">Subject Results (0–100)</h3>
+      <div class="subject-grid">
+        <div><label for="math">Maths</label><input id="math" type="number" min="0" max="100" step="any" required></div>
+        <div><label for="english">English</label><input id="english" type="number" min="0" max="100" step="any" required></div>
+        <div><label for="computer">Computer</label><input id="computer" type="number" min="0" max="100" step="any" required></div>
+        <div><label for="kiswahili">Kiswahili</label><input id="kiswahili" type="number" min="0" max="100" step="any" required></div>
+        <div><label for="biology">Biology</label><input id="biology" type="number" min="0" max="100" step="any" required></div>
+        <div><label for="chemistry">Chemistry</label><input id="chemistry" type="number" min="0" max="100" step="any" required></div>
+        <div><label for="csl">CSL</label><input id="csl" type="number" min="0" max="100" step="any" required></div>
+      </div>
+
+      <button type="submit" class="action">Calculate and Save Results</button>
+      <button type="reset" class="action blue">Clear Form</button>
+    </form>
+
+    <div id="message" aria-live="polite"></div>
+  </div>
+
+  <div id="preview" class="panel" hidden>
+    <h3>Learner Report</h3>
+    <pre id="previewText" style="white-space:pre-wrap;overflow-wrap:anywhere;font-family:monospace"></pre>
+    <button class="action blue" onclick="downloadLatest()">Download This Report</button>
+    <button class="action" onclick="saveToDocuments()">Save Report to Documents</button>
+  </div>
+</div>
+
+<div id="records" class="page">
+  <div class="panel">
+    <h3>Learner Records</h3>
+    <input id="search" placeholder="Search learners" oninput="renderRecords()">
+    <div class="table-wrap" style="margin-top:14px">
+      <table>
+        <thead><tr><th>Name</th><th>Admission</th><th>Stream</th><th>Total</th><th>Mean</th><th>Grade</th><th>Report</th></tr></thead>
+        <tbody id="recordRows"></tbody>
+      </table>
+    </div>
+    <p id="recordMessage" class="muted"></p>
+  </div>
+</div>
+
+<div id="reports" class="page">
+  <div class="panel">
+    <h3>Reports and Backups</h3>
+    <p>Save all learner reports to a location you select, including Documents when supported.</p>
+    <button class="action" onclick="saveToDocuments()">Save Results to Documents</button>
+    <p>Download all learner reports as a text file.</p>
+    <button class="action blue" onclick="downloadAll()">Download results.txt</button>
+    <p>Export all results as a CSV file.</p>
+    <button class="action blue" onclick="downloadCSV()">Export CSV</button>
+    <div class="notice">Records are stored in this browser. Download backups regularly.</div>
+  </div>
+</div>
+
+</main>
+
+<footer>Learner Results Analytics · Educational demonstration</footer>
+
+<script>
+"use strict";
+
+const subjects = [
+  ["math","Maths"],
+  ["english","English"],
+  ["computer","Computer"],
+  ["kiswahili","Kiswahili"],
+  ["biology","Biology"],
+  ["chemistry","Chemistry"],
+  ["csl","CSL"]
+];
+
+const STORAGE_KEY = "learner_results_analytics_v1";
+let learners = loadLearners();
+let latestReport = "";
+
+function loadLearners() {
+  try {
+    const data = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    return Array.isArray(data) ? data.filter(s =>
+      s && typeof s.name === "string" &&
+      typeof s.admission === "string" &&
+      Array.isArray(s.marks) && s.marks.length === 7
+    ) : [];
+  } catch(e) {
+    return [];
+  }
+}
+
+function persist() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(learners));
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+/* Original grading thresholds preserved */
+function gradeFor(mean) {
+  if (mean > 85) return "EE 1";
+  else if (mean > 75) return "EE 2";
+  else if (mean > 65) return "ME 1";
+  else if (mean > 58) return "ME 2";
+  else if (mean > 45) return "AE 1";
+  else if (mean > 35) return "AE 2";
+  else if (mean > 25) return "BE 1";
+  else if (mean > 0) return "BE 2";
+  else return "Below grading range";
+}
+
+function calculate(marks) {
+  const total = marks.reduce((sum,n) => sum+n,0);
+  const mean = total/7;
+  return {total,mean,grade:gradeFor(mean)};
+}
+
+function makeReport(s) {
+  const r = calculate(s.marks);
+
+  return `
+========================================
+          LEARNER REPORT
+========================================
+Name:       ${s.name}
+Stream:     ${s.stream}
+Admission:  ${s.admission}
+
+SUBJECT RESULTS
+Maths:      ${s.marks[0]}
+English:    ${s.marks[1]}
+Computer:   ${s.marks[2]}
+Kiswahili:  ${s.marks[3]}
+Biology:    ${s.marks[4]}
+Chemistry:  ${s.marks[5]}
+CSL:        ${s.marks[6]}
+
+Total:      ${Number.isInteger(r.total) ? r.total : r.total.toFixed(3)} / 700
+Mean:       ${r.mean.toFixed(3)}
+Grade:      ${r.grade}
+========================================
+`.trim();
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g,ch => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",
+    '"':"&quot;","'":"&#39;"
+  })[ch]);
+}
+
+function showPage(id,button) {
+  document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  if(button) button.classList.add("active");
+  refresh();
+}
+
+document.getElementById("learnerForm").addEventListener("submit",function(event) {
+  event.preventDefault();
+
+  const name = document.getElementById("name").value.trim();
+  const stream = document.getElementById("stream").value.trim();
+  const admission = document.getElementById("admission").value.trim();
+
+  const marks = subjects.map(([id]) => {
+    const field = document.getElementById(id);
+    return field.value.trim() === "" ? NaN : Number(field.value);
+  });
+
+  if(!name || !stream || !admission)
+    return showMessage("Complete all learner details.",true);
+
+  if(marks.some(n=>!Number.isFinite(n)||n<0||n>100))
+    return showMessage("Every mark must be between 0 and 100.",true);
+
+  if(learners.some(s=>s.admission.toLowerCase()===admission.toLowerCase()))
+    return showMessage("Admission number already exists.",true);
+
+  const learner = {
+    id:Date.now().toString()+"-"+Math.random().toString(36).slice(2),
+    name,stream,admission,marks,
+    date:new Date().toISOString()
+  };
+
+  learners.push(learner);
+
+  if(!persist()) {
+    learners.pop();
+    return showMessage("Unable to save. Check browser storage.",true);
+  }
+
+  latestReport = makeReport(learner);
+  document.getElementById("previewText").textContent = latestReport;
+  document.getElementById("preview").hidden = false;
+
+  this.reset();
+  refresh();
+  showMessage("SUCCESS: Results saved in browser storage. Use Reports to save a file to Documents.",false);
+});
+
+function showMessage(message,isError) {
+  const box = document.getElementById("message");
+  box.textContent = message;
+  box.className = "notice"+(isError?" error":"");
+}
+
+function refresh() {
+  document.getElementById("count").textContent = learners.length;
+
+  const results = learners.map(s=>calculate(s.marks));
+  const avg = results.length
+    ? results.reduce((sum,r)=>sum+r.mean,0)/results.length : 0;
+
+  document.getElementById("overallMean").textContent = avg.toFixed(2);
+  document.getElementById("highestMean").textContent = results.length
+    ? Math.max(...results.map(r=>r.mean)).toFixed(2) : "0.00";
+
+  renderRecords();
+}
+
+function renderRecords() {
+  const search = document.getElementById("search").value.toLowerCase();
+  const filtered = learners.filter(s =>
+    [s.name,s.stream,s.admission].some(v=>v.toLowerCase().includes(search))
+  );
+
+  document.getElementById("recordRows").innerHTML = filtered.map(s=>{
+    const r = calculate(s.marks);
+    return `<tr>
+      <td>${escapeHTML(s.name)}</td>
+      <td>${escapeHTML(s.admission)}</td>
+      <td>${escapeHTML(s.stream)}</td>
+      <td>${r.total}/700</td>
+      <td>${r.mean.toFixed(3)}</td>
+      <td>${escapeHTML(r.grade)}</td>
+      <td><button class="action blue" onclick="viewReport('${s.id}')">View</button></td>
+    </tr>`;
+  }).join("");
+
+  document.getElementById("recordMessage").textContent =
+    filtered.length+" learner(s) displayed.";
+}
+
+function viewReport(id) {
+  const s = learners.find(x=>x.id===id);
+  if(!s) return;
+
+  latestReport = makeReport(s);
+  document.getElementById("previewText").textContent = latestReport;
+  document.getElementById("preview").hidden = false;
+  showPage("entry",document.querySelectorAll("nav button")[1]);
+}
+
+function downloadText(filename,content) {
+  const blob = new Blob([content],{type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+
+/* Save directly to a user-selected file when supported.
+   Otherwise download the file for manual movement to Documents. */
+async function saveToDocuments() {
+  const content = learners.map(makeReport).join("\n\n");
+
+  if (!content) {
+    alert("No learner results to save.");
+    return;
+  }
+
+  try {
+    if ("showSaveFilePicker" in window) {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: "results.txt",
+        types: [{
+          description: "Text file",
+          accept: {"text/plain":[".txt"]}
+        }]
+      });
+
+      const writable = await handle.createWritable();
+      await writable.write(content + "\n");
+      await writable.close();
+
+      alert("Results saved to the selected location.");
+    } else {
+      downloadText("results.txt",content + "\n");
+      alert("File downloaded. Open Downloads in your Files app and move results.txt to Documents.");
+    }
+  } catch (error) {
+    if (error.name !== "AbortError") {
+      downloadText("results.txt",content + "\n");
+      alert("The save dialog was unavailable. The file has been downloaded if your browser permits downloads. Move results.txt from Downloads to Documents.");
+    }
+  }
+}
+
+function downloadLatest() {
+  if(!latestReport) return alert("No report available.");
+  downloadText("learner_report.txt",latestReport+"\n");
+}
+
+function downloadAll() {
+  const text = learners.map(makeReport).join("\n\n");
+  downloadText("results.txt",text+(text?"\n":""));
+}
+
+function downloadCSV() {
+  const headings = [
+    "Name","Stream","Admission",...subjects.map(s=>s[1]),
+    "Total","Mean","Grade"
+  ];
+
+  const rows = learners.map(s=>{
+    const r=calculate(s.marks);
+    return [s.name,s.stream,s.admission,...s.marks,
+      r.total,r.mean.toFixed(3),r.grade];
+  });
+
+  const csv=[headings,...rows].map(row=>
+    row.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(",")
+  ).join("\r\n");
+
+  downloadText("learner_results.csv","\uFEFF"+csv);
+}
+
+refresh();
+</script>
+</body>
+<<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Page title</title>
+</head>
+<body>
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Page title</title>
+    </head>
+    <body>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <title>Page title</title>
+        </head>
+        <body>
+            
+        </body>
+        </html>
+    </body>
+    </html>
+</body>
+</html>/html>
